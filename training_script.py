@@ -3,9 +3,10 @@
 import picamera as picam
 import RPi.GPIO as GPIO
 from time import sleep
+import os, sys
 
 PATH = 'four-blind-mice/training_images/'
-TIME_IN_MINUTES = 0.5
+TIME_IN_MINUTES = 2*60
 
 #setup
 GPIO.setmode(GPIO.BCM)
@@ -25,6 +26,7 @@ while not pressed:
         pressed = GPIO.wait_for_edge(23, GPIO.RISING)
     except KeyboardInterrupt:
         break
+pressed = True
 
 print("Start recording")
 for i in range(3):
@@ -35,12 +37,38 @@ for i in range(3):
 
 #record images
 while count >=0:
+    pressed = not GPIO.input(23)
+    if not pressed:    
+        print("Stopped recording")
+        for i in range(2):
+            GPIO.output(18, GPIO.HIGH)
+            sleep(1)
+            GPIO.output(18, GPIO.LOW)
+            sleep(1)
+        while not pressed:
+            try:
+                pressed = GPIO.wait_for_edge(23, GPIO.RISING)
+            except KeyboardInterrupt:
+                break
+        print("Resumed recording")
+        for i in range(3):
+            GPIO.output(18, GPIO.HIGH)
+            sleep(1)
+            GPIO.output(18, GPIO.LOW)
+            sleep(1)
+    print("Recording")
     camera.capture(PATH+ 'pic_'+str(count)+'.jpg')
     sleep(0.5)
     count-=1
 
 print "Done recording"
 GPIO.output(18, GPIO.HIGH)
-sleep(5)
+pressed = False
+while not pressed:
+    try:
+        pressed = GPIO.wait_for_edge(23, GPIO.RISING)
+    except KeyboardInterrupt:
+        break
+GPIO.output(18, GPIO.HIGH)
 
 GPIO.cleanup()
