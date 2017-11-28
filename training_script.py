@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
-import picamera as picam
+#import picamera as picam
+import pygame.camera
 import RPi.GPIO as GPIO
 from time import sleep
 import os, sys
 
 PATH = 'four-blind-mice/training_images/'
-TIME_IN_MINUTES = 2*60
+TIME_IN_MINUTES = 1
 
 #setup
 GPIO.setmode(GPIO.BCM)
@@ -18,7 +19,10 @@ GPIO.output(18, GPIO.LOW)
 
 pressed = False
 count = int(TIME_IN_MINUTES*60*2)
-camera = picam.PiCamera()
+#camera = picam.PiCamera()
+pygame.camera.init()
+camera = pygame.camera.Camera(pygame.camera.list_cameras()[0], (1080, 1080))
+camera.start()
 
 #look for button press to start
 while not pressed:
@@ -57,7 +61,9 @@ while count >=0:
             GPIO.output(18, GPIO.LOW)
             sleep(1)
     print("Recording")
-    camera.capture(PATH+ 'pic_'+str(count)+'.jpg')
+    #camera.capture(PATH+ 'pic_'+str(count)+'.jpg')
+    img = camera.get_image()
+    pygame.image.save(img, PATH+ 'pic_' +str(count)+'.jpg')
     sleep(0.5)
     count-=1
 
