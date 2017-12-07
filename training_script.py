@@ -7,7 +7,7 @@ from time import sleep
 import os, sys
 
 PATH = 'four-blind-mice/training_images/'
-TIME_IN_MINUTES = 1
+TIME_IN_MINUTES = 90
 
 #setup
 GPIO.setmode(GPIO.BCM)
