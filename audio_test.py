@@ -3,7 +3,7 @@ import pygame
 
 pygame.init()
 pygame.mixer.init()
-sounda = pygame.mixer.Sound('audio/ahem_x.wav')
+sounda = pygame.mixer.Sound('audio/Wait.wav')
 sounda.play()
 
 #once you start playing a sound with pygame, you are free to execute commands

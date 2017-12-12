@@ -18,12 +18,12 @@ input_std = 128
 input_layer = "input"
 output_layer = "final_result"
 
-PATH = 'four-blind-mice/'
+PATH = '/'
 WALK_BUTTON = 17
 INDICATOR = 18
 OP_BUTTON = 23
-walk_sound = PATH + 'audio/Walk.m4a'
-wait_sound = PATH + 'audio/Wait.m4a'
+walk_file = 'audio/Walk.wav'
+wait_file = 'audio/Wait.wav'
 
 def load_graph(model_file):
 	graph = tf.Graph()
@@ -63,45 +63,77 @@ def classify_pic(graph, image_file):
 	top_k = results.argsort()[-5:][::-1]
 	for i in top_k:
 		print(labels[i], results[i])		
-	print(labels[top_k[0]])
 	return(top_k[0])
 
 def crossing():
+	wait_sound.play()
+	walk = False
+	while not walk:
+		#wait for walk sign to turn on
+		img = camera.get_image()
+		pygame.image.save(img,'crossing_pic.jpg')	
+		walk = classify_pic(graph,'crossing_pic.jpg')	
+		if walk:
+			print("Begin crossing.")
+			walk_sound.play()
+		else:
+			print("Wait to cross.")
+			wait_sound.play()
+	while walk:
+		img = camera.get_image()
+		pygame.image.save(img,'crossing_pic.jpg')	
+		walk = classify_pic(graph,'crossing_pic.jpg')
+		if walk:
+			print("Continue crossing.")
+			walk_sound.play()
+		else:
+			print("Stop crossing.")
+			wait_sound.play()
 	
+
 
 def setup():
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(WALK_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 	GPIO.setup(INDICATOR, GPIO.OUT) 
 	GPIO.output(INDICATOR, GPIO.LOW)
+	global graph
 	graph = load_graph(model_file)
 	pygame.init()
 	pygame.mixer.init()
+	global walk_sound
+	global wait_sound
+	walk_sound = pygame.mixer.Sound(walk_file)
+	wait_sound = pygame.mixer.Sound(wait_file)
 	pygame.camera.init()
-	camera = pygame.camera.Camera(pygame.camera.ist_cameras()[0], (1080, 1080))
+	global camera
+	camera = pygame.camera.Camera(pygame.camera.list_cameras()[0], (1080, 1080))
 	camera.start()
 	#ready to go
 	GPIO.output(INDICATOR, GPIO.HIGH)
 	sleep(2)
 	GPIO.output(INDICATOR, GPIO.LOW)
 
-#graph = load_graph(model_file)
-#classify_pic(graph, "pic_9845.jpg")
 
-def main:
+def main():
 	#run setup, play light to indicate readiness
 	setup()
 	walk_button = False
 	while True:	
-		#wait for walk button to be pressed to start crossing
-		while not walk_button:
-			try: 
-				pressed = GPIO.wait_for_edge(WALK_BUTTON, GPIO.RISING)
-				if pressed:
-					print("Walk sign on")
-			except KeyboardInterrupt:
-				break
-		crossing()
+		try:
+			#wait for walk button to be pressed to start crossing
+			while not walk_button:
+				try: 
+					walk_button  = GPIO.wait_for_edge(WALK_BUTTON, GPIO.RISING)
+					if walk_button:
+						print("Walk sign on")
+				except KeyboardInterrupt:
+					break
+			crossing()
+			walk_button = False
+		except KeyboardInterrupt:
+			break
 
-		
+
+main()	
 		
