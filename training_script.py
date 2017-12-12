@@ -50,7 +50,7 @@ while count >=0:
             GPIO.output(18, GPIO.LOW)
             sleep(1)
         while not pressed:
-            try:
+           try:
                 pressed = GPIO.wait_for_edge(23, GPIO.RISING)
             except KeyboardInterrupt:
                 break

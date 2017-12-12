@@ -1,14 +1,6 @@
-#proof of concept for Team 131
-
 import tensorflow as tf
 import numpy as np
-import pygame.camera
-import RPi.GPIO as GPIO
-from time import sleep
-import os, sys
-import pygame
 
-#constants
 labels = ["wait", "walk"] 
 model_file = "retrained_graph.pb"
 image_height = 224
@@ -17,13 +9,6 @@ input_mean = 128
 input_std = 128
 input_layer = "input"
 output_layer = "final_result"
-
-PATH = 'four-blind-mice/'
-WALK_BUTTON = 17
-INDICATOR = 18
-OP_BUTTON = 23
-walk_sound = PATH + 'audio/Walk.m4a'
-wait_sound = PATH + 'audio/Wait.m4a'
 
 def load_graph(model_file):
 	graph = tf.Graph()
@@ -66,42 +51,10 @@ def classify_pic(graph, image_file):
 	print(labels[top_k[0]])
 	return(top_k[0])
 
-def crossing():
-	
-
-def setup():
-	GPIO.setmode(GPIO.BCM)
-	GPIO.setup(WALK_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-	GPIO.setup(INDICATOR, GPIO.OUT) 
-	GPIO.output(INDICATOR, GPIO.LOW)
-	graph = load_graph(model_file)
-	pygame.init()
-	pygame.mixer.init()
-	pygame.camera.init()
-	camera = pygame.camera.Camera(pygame.camera.ist_cameras()[0], (1080, 1080))
-	camera.start()
-	#ready to go
-	GPIO.output(INDICATOR, GPIO.HIGH)
-	sleep(2)
-	GPIO.output(INDICATOR, GPIO.LOW)
 
 #graph = load_graph(model_file)
 #classify_pic(graph, "pic_9845.jpg")
 
-def main:
-	#run setup, play light to indicate readiness
-	setup()
-	walk_button = False
-	while True:	
-		#wait for walk button to be pressed to start crossing
-		while not walk_button:
-			try: 
-				pressed = GPIO.wait_for_edge(WALK_BUTTON, GPIO.RISING)
-				if pressed:
-					print("Walk sign on")
-			except KeyboardInterrupt:
-				break
-		crossing()
 
-		
-		
+
+
