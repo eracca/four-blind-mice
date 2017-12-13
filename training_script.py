@@ -6,8 +6,8 @@ import RPi.GPIO as GPIO
 from time import sleep
 import os, sys
 
-PATH = 'four-blind-mice/training_images/'
-TIME_IN_MINUTES = 90
+PATH = 'training_images/'
+TIME_IN_MINUTES = 100
 
 #setup
 GPIO.setmode(GPIO.BCM)
@@ -50,7 +50,7 @@ while count >=0:
             GPIO.output(18, GPIO.LOW)
             sleep(1)
         while not pressed:
-           try:
+            try:
                 pressed = GPIO.wait_for_edge(23, GPIO.RISING)
             except KeyboardInterrupt:
                 break
@@ -67,7 +67,7 @@ while count >=0:
     sleep(0.5)
     count-=1
 
-print "Done recording"
+print ("Done recording")
 GPIO.output(18, GPIO.HIGH)
 pressed = False
 while not pressed:

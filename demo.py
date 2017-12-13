@@ -48,7 +48,18 @@ def read_tensor_from_image_file(file_name, input_height=299, input_width=299,
 	result = sess.run(normalized)
 	return result
 
+def read_tensor_from_image(image, input_height=299, input_width=299, input_mean=0, input_std=255):	
+	image_reader = image
+	float_caster = tf.cast(image_reader, tf.float32)
+	dims_expander = tf.expand_dims(float_caster, 0);
+	resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
+	normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
+	sess = tf.Session()
+	result = sess.run(normalized)
+	return result
+
 def classify_pic(graph, image_file):
+	print("classifying " + image_file)
 	input_layer = "input"
 	output_later = "final_result"
 	t = read_tensor_from_image_file(image_file, image_height, image_width,
@@ -71,25 +82,24 @@ def crossing():
 	while not walk:
 		#wait for walk sign to turn on
 		img = camera.get_image()
-		pygame.image.save(img,'crossing_pic.jpg')	
+		pygame.image.save(img,'crossing_pic.jpg')
 		walk = classify_pic(graph,'crossing_pic.jpg')	
 		if walk:
-			print("Begin crossing.")
-			walk_sound.play()
+			walk_sound.play()	
+			print("Begin crossing.")	
 		else:
-			print("Wait to cross.")
 			wait_sound.play()
+			print("Wait to cross.")
 	while walk:
 		img = camera.get_image()
-		pygame.image.save(img,'crossing_pic.jpg')	
+		pygame.image.save(img,'crossing_pic.jpg')
 		walk = classify_pic(graph,'crossing_pic.jpg')
 		if walk:
-			print("Continue crossing.")
 			walk_sound.play()
+			print("Continue crossing.")
 		else:
+			wait_sound.play()	
 			print("Stop crossing.")
-			wait_sound.play()
-	
 
 
 def setup():
@@ -113,6 +123,7 @@ def setup():
 	GPIO.output(INDICATOR, GPIO.HIGH)
 	sleep(2)
 	GPIO.output(INDICATOR, GPIO.LOW)
+	print("Ready to go")
 
 
 def main():

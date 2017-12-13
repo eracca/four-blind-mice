@@ -52,8 +52,8 @@ def classify_pic(graph, image_file):
 	return(top_k[0])
 
 
-#graph = load_graph(model_file)
-#classify_pic(graph, "pic_9845.jpg")
+graph = load_graph(model_file)
+classify_pic(graph, "pic_9845.jpg")
 
 
 
